@@ -6,5 +6,13 @@
     "source": "stripe",
     "stripe_id": "cs_test_a1XGltodm1Wx8wtsWlm6lRrMAzvMLsCqpx7oBkv6tkaKzE4gNIGs3fS2dD",
     "time": "2026-03-05T21:41:59.990890"
+  },
+  {
+    "name": "anu",
+    "amount": 50.0,
+    "anonymous": false,
+    "source": "stripe",
+    "stripe_id": "cs_test_a1nCppUXH3qRk3eUSju99bS7VteXnAXiYUIN6Ui8wyNy5cZKwAW906VK67",
+    "time": "2026-03-05T21:54:21.319737"
   }
 ]
