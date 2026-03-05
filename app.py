@@ -6,7 +6,7 @@ from datetime import datetime
 
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="Conference Fund 2026",
+    page_title="Conference Fund 2025",
     page_icon="✝️",
     layout="centered",
     initial_sidebar_state="collapsed",
@@ -25,16 +25,54 @@ ADMIN_PASSWORD = "church2025"          # ← change before deploying!
 # ─────────────────────────────────────────────────────────────────────────────
 STRIPE_PAYMENT_LINK = "https://buy.stripe.com/test_fZu28r9ZSaLogNmc6v3ks00"
 
+# GitHub repo where donations.json is stored (same repo as webhook_server.py pushes to)
+GITHUB_REPO      = "rakeshchurchdev/budget_tracker"
+GITHUB_FILE      = "donations.json"
+GITHUB_RAW_URL   = f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/{GITHUB_FILE}"
+
 # ── Helpers ───────────────────────────────────────────────────────────────────
 def load_donations():
-    if os.path.exists(DATA_FILE):
-        with open(DATA_FILE, "r") as f:
-            return json.load(f)
-    return []
+    """Load donations from GitHub raw URL so we always get the latest data."""
+    try:
+        import urllib.request
+        url = GITHUB_RAW_URL + f"?t={int(time.time())}"   # bust cache
+        with urllib.request.urlopen(url, timeout=5) as resp:
+            return json.loads(resp.read().decode())
+    except Exception:
+        # Fallback to local file if GitHub is unreachable
+        if os.path.exists(DATA_FILE):
+            with open(DATA_FILE, "r") as f:
+                return json.load(f)
+        return []
 
 def save_donations(donations):
+    """Save donations locally (used for manual entries — webhook handles Stripe ones)."""
     with open(DATA_FILE, "w") as f:
         json.dump(donations, f, indent=2)
+
+def push_to_github(donations):
+    """Push updated donations.json to GitHub after a manual entry."""
+    try:
+        import urllib.request, urllib.error, base64
+        token   = st.secrets.get("GIT_TOKEN", os.environ.get("GIT_TOKEN", ""))
+        if not token:
+            return  # No token configured, skip push
+        api_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{GITHUB_FILE}"
+        headers = {"Authorization": f"token {token}", "Content-Type": "application/json"}
+        # Get current SHA
+        req = urllib.request.Request(api_url, headers=headers)
+        with urllib.request.urlopen(req) as resp:
+            sha = json.loads(resp.read()).get("sha", "")
+        # Push updated file
+        data = json.dumps({
+            "message": "manual donation entry",
+            "content": base64.b64encode(json.dumps(donations, indent=2).encode()).decode(),
+            "sha": sha,
+        }).encode()
+        req = urllib.request.Request(api_url, data=data, headers=headers, method="PUT")
+        urllib.request.urlopen(req)
+    except Exception as e:
+        pass  # Silently fail — donation is still saved locally
 
 def total_raised(donations):
     return sum(d["amount"] for d in donations)
@@ -190,7 +228,7 @@ remaining   = max(GOAL - raised, 0)
 donor_count = len(donations)
 
 # ── Hero ──────────────────────────────────────────────────────────────────────
-st.markdown('<div class="hero-title">✝ Conference Fund 2026</div>', unsafe_allow_html=True)
+st.markdown('<div class="hero-title">✝ Conference Fund 2025</div>', unsafe_allow_html=True)
 st.markdown('<div class="hero-sub">Together we rise · £50,000 Goal</div>', unsafe_allow_html=True)
 
 if raised >= GOAL:
@@ -314,6 +352,7 @@ with st.form("donate_form", clear_on_submit=True):
             }
             donations.append(new_donation)
             save_donations(donations)
+            push_to_github(donations)
             st.success(f"Recorded £{amount:,.2f} from {'Anonymous' if anonymous else name}. God bless! 🙏")
             time.sleep(0.5)
             st.rerun()
