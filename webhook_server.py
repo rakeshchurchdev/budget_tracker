@@ -122,28 +122,28 @@ def add_stripe_donation(session: dict):
     save_donations(donations)
     print(f"[webhook] ✅ Saved donation: £{amount_total:.2f} from {customer_name}")
 
-    # ── Option A: commit back to GitHub so Streamlit Cloud picks it up ────────
-    # Uncomment the lines below if both servers share the same GitHub repo.
-    # Set GIT_TOKEN and GIT_REPO as Railway environment variables.
-    #
-    # try:
-    #     import requests, base64
-    #     token   = os.environ["GIT_TOKEN"]
-    #     repo    = os.environ["GIT_REPO"]   # e.g. "yourname/conference-tracker"
-    #     api_url = f"https://api.github.com/repos/{repo}/contents/{DATA_FILE}"
-    #     headers = {"Authorization": f"token {token}"}
-    #     get_resp = requests.get(api_url, headers=headers).json()
-    #     sha = get_resp.get("sha", "")
-    #     with open(DATA_FILE, "rb") as f:
-    #         content = base64.b64encode(f.read()).decode()
-    #     requests.put(api_url, headers=headers, json={
-    #         "message": f"donation: £{amount_total:.2f}",
-    #         "content": content,
-    #         "sha": sha,
-    #     })
-    #     print("[webhook] ✅ Pushed donations.json to GitHub")
-    # except Exception as e:
-    #     print(f"[webhook] GitHub push failed: {e}")
+    # ── Push donations.json to GitHub so Streamlit Cloud picks it up ─────────
+    try:
+        import requests, base64
+        token   = os.environ["GIT_TOKEN"]
+        repo    = os.environ.get("GIT_REPO", "rakeshchurchdev/budget_tracker")
+        api_url = f"https://api.github.com/repos/{repo}/contents/{DATA_FILE}"
+        headers = {"Authorization": f"token {token}"}
+        get_resp = requests.get(api_url, headers=headers).json()
+        sha = get_resp.get("sha", "")
+        with open(DATA_FILE, "rb") as f:
+            content = base64.b64encode(f.read()).decode()
+        put_resp = requests.put(api_url, headers=headers, json={
+            "message": f"donation: £{amount_total:.2f} from {customer_name}",
+            "content": content,
+            "sha": sha,
+        })
+        if put_resp.status_code in (200, 201):
+            print(f"[webhook] ✅ Pushed donations.json to GitHub")
+        else:
+            print(f"[webhook] ⚠️ GitHub push returned {put_resp.status_code}: {put_resp.text}")
+    except Exception as e:
+        print(f"[webhook] ❌ GitHub push failed: {e}")
 
 # ── HTTP Handler ──────────────────────────────────────────────────────────────
 class WebhookHandler(BaseHTTPRequestHandler):
