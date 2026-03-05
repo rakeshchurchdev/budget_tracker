@@ -23,7 +23,7 @@ ADMIN_PASSWORD = "church2025"          # ← change before deploying!
 #   2. Add a product called "Conference Donation", price = customer chooses, GBP
 #   3. Copy the https://buy.stripe.com/... link and paste below
 # ─────────────────────────────────────────────────────────────────────────────
-STRIPE_PAYMENT_LINK = "https://buy.stripe.com/YOUR_LINK_HERE"   # ← replace!
+STRIPE_PAYMENT_LINK = "https://buy.stripe.com/test_fZu28r9ZSaLogNmc6v3ks00"
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 def load_donations():
@@ -223,18 +223,18 @@ if stripe_configured:
     st.markdown(f"""
     <div class="pay-box">
       <div class="pay-title">✝ Give to the Conference</div>
-      <div class="pay-sub">Secure card payment · Any amount · GBP (£)</div>
+      <div class="pay-sub">Click below · On the checkout page, set the <b style="color:#a0c070;">Quantity = your donation in £</b><br>
+      e.g. Quantity <b style="color:#f5d06b;">50</b> = £50 &nbsp;·&nbsp; Quantity <b style="color:#f5d06b;">100</b> = £100</div>
       <div class="presets">
-        <a class="preset-chip" href="{STRIPE_PAYMENT_LINK}" target="_blank">£10</a>
-        <a class="preset-chip" href="{STRIPE_PAYMENT_LINK}" target="_blank">£25</a>
-        <a class="preset-chip" href="{STRIPE_PAYMENT_LINK}" target="_blank">£50</a>
-        <a class="preset-chip" href="{STRIPE_PAYMENT_LINK}" target="_blank">£100</a>
-        <a class="preset-chip" href="{STRIPE_PAYMENT_LINK}" target="_blank">£250</a>
-        <a class="preset-chip" href="{STRIPE_PAYMENT_LINK}" target="_blank">Custom £</a>
+        <a class="preset-chip" href="{STRIPE_PAYMENT_LINK}" target="_blank">£10 → qty 10</a>
+        <a class="preset-chip" href="{STRIPE_PAYMENT_LINK}" target="_blank">£25 → qty 25</a>
+        <a class="preset-chip" href="{STRIPE_PAYMENT_LINK}" target="_blank">£50 → qty 50</a>
+        <a class="preset-chip" href="{STRIPE_PAYMENT_LINK}" target="_blank">£100 → qty 100</a>
+        <a class="preset-chip" href="{STRIPE_PAYMENT_LINK}" target="_blank">£250 → qty 250</a>
       </div>
       <a class="pay-btn" href="{STRIPE_PAYMENT_LINK}" target="_blank">💛 Donate Now</a>
-      <div class="pay-note">Opens a secure Stripe checkout page · Card, Apple Pay, Google Pay accepted</div>
-      <div><span class="stripe-badge">🔒 Powered by Stripe · Bank-level encryption</span></div>
+      <div class="pay-note">🔢 On the next page — type your £ amount into the <b>Quantity</b> box</div>
+      <div><span class="stripe-badge">🔒 Powered by Stripe · Card, Apple Pay & Google Pay accepted</span></div>
     </div>
     """, unsafe_allow_html=True)
 else:
