@@ -289,8 +289,8 @@ remaining = max(GOAL - raised, 0)
 donor_count = len(donations)
 
 # ── Hero ──────────────────────────────────────────────────────────────────────
-st.markdown('<div class="hero-title">✝ Conference Fund 2025</div>', unsafe_allow_html=True)
-st.markdown('<div class="hero-sub">Together we rise · £50,000 Goal</div>', unsafe_allow_html=True)
+st.markdown('<div class="hero-title">✝ Conference Fund 2026</div>', unsafe_allow_html=True)
+st.markdown('<div class="hero-sub">Together we rise · £75,000 Goal</div>', unsafe_allow_html=True)
 
 # ── Goal complete banner ───────────────────────────────────────────────────────
 if raised >= GOAL:
