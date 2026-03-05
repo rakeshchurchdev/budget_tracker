@@ -28,18 +28,25 @@ STRIPE_PAYMENT_LINK = "https://buy.stripe.com/test_fZu28r9ZSaLogNmc6v3ks00"
 # GitHub repo where donations.json is stored (same repo as webhook_server.py pushes to)
 GITHUB_REPO      = "rakeshchurchdev/budget_tracker"
 GITHUB_FILE      = "donations.json"
-GITHUB_RAW_URL   = f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/{GITHUB_FILE}"
+GITHUB_API_URL   = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{GITHUB_FILE}"
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 def load_donations():
-    """Load donations from GitHub raw URL so we always get the latest data."""
+    """Load donations via GitHub API — always returns latest committed version."""
     try:
-        import urllib.request
-        url = GITHUB_RAW_URL + f"?t={int(time.time())}"   # bust cache
-        with urllib.request.urlopen(url, timeout=5) as resp:
-            return json.loads(resp.read().decode())
+        import urllib.request, base64
+        token   = st.secrets.get("GIT_TOKEN", os.environ.get("GIT_TOKEN", ""))
+        headers = {"Accept": "application/vnd.github.v3+json"}
+        if token:
+            headers["Authorization"] = f"token {token}"
+        req = urllib.request.Request(GITHUB_API_URL, headers=headers)
+        with urllib.request.urlopen(req, timeout=8) as resp:
+            payload = json.loads(resp.read().decode())
+            # GitHub API returns file content as base64
+            decoded = base64.b64decode(payload["content"]).decode("utf-8")
+            return json.loads(decoded)
     except Exception:
-        # Fallback to local file if GitHub is unreachable
+        # Fallback to local file
         if os.path.exists(DATA_FILE):
             with open(DATA_FILE, "r") as f:
                 return json.load(f)
@@ -57,10 +64,10 @@ def push_to_github(donations):
         token   = st.secrets.get("GIT_TOKEN", os.environ.get("GIT_TOKEN", ""))
         if not token:
             return  # No token configured, skip push
-        api_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{GITHUB_FILE}"
-        headers = {"Authorization": f"token {token}", "Content-Type": "application/json"}
+        headers = {"Authorization": f"token {token}", "Content-Type": "application/json",
+                   "Accept": "application/vnd.github.v3+json"}
         # Get current SHA
-        req = urllib.request.Request(api_url, headers=headers)
+        req = urllib.request.Request(GITHUB_API_URL, headers=headers)
         with urllib.request.urlopen(req) as resp:
             sha = json.loads(resp.read()).get("sha", "")
         # Push updated file
@@ -69,7 +76,7 @@ def push_to_github(donations):
             "content": base64.b64encode(json.dumps(donations, indent=2).encode()).decode(),
             "sha": sha,
         }).encode()
-        req = urllib.request.Request(api_url, data=data, headers=headers, method="PUT")
+        req = urllib.request.Request(GITHUB_API_URL, data=data, headers=headers, method="PUT")
         urllib.request.urlopen(req)
     except Exception as e:
         pass  # Silently fail — donation is still saved locally
