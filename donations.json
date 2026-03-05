@@ -1,0 +1,10 @@
+[
+  {
+    "name": "rakioo",
+    "amount": 1.0,
+    "anonymous": false,
+    "source": "stripe",
+    "stripe_id": "cs_test_a1XGltodm1Wx8wtsWlm6lRrMAzvMLsCqpx7oBkv6tkaKzE4gNIGs3fS2dD",
+    "time": "2026-03-05T21:41:59.990890"
+  }
+]
