@@ -14,5 +14,13 @@
     "source": "stripe",
     "stripe_id": "cs_test_a1nCppUXH3qRk3eUSju99bS7VteXnAXiYUIN6Ui8wyNy5cZKwAW906VK67",
     "time": "2026-03-05T21:54:21.319737"
+  },
+  {
+    "name": "test",
+    "amount": 75.0,
+    "anonymous": false,
+    "source": "stripe",
+    "stripe_id": "cs_test_a1OJEwsfAC7u0tmnLBAxl6p2X9ab5EgnM8pSOAzQvpSVsKLGaitqeLBeJd",
+    "time": "2026-03-05T22:00:53.130282"
   }
 ]
