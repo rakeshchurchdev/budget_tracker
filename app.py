@@ -6,7 +6,7 @@ from datetime import datetime
 
 # ── Page config ──────────────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="Conference Fund 2025",
+    page_title="Conference Fund 2026",
     page_icon="✝️",
     layout="centered",
     initial_sidebar_state="collapsed",
