@@ -227,39 +227,13 @@ hr { border-color: #1e2a40 !important; margin: 2rem 0; }
 </style>
 """, unsafe_allow_html=True)
 
-# ── Load data ─────────────────────────────────────────────────────────────────
-# DEBUG — show exactly what is happening with the data fetch
-# try:
-#     import urllib.request, base64 as b64
-#     token = st.secrets.get("GIT_TOKEN", os.environ.get("GIT_TOKEN", ""))
-#     headers = {"Accept": "application/vnd.github.v3+json"}
-#     if token:
-#         headers["Authorization"] = f"token {token}"
-#     req = urllib.request.Request(GITHUB_API_URL, headers=headers)
-#     with urllib.request.urlopen(req, timeout=8) as resp:
-#         payload = json.loads(resp.read().decode())
-#         decoded = b64.b64decode(payload["content"]).decode("utf-8")
-#         _debug_data  = json.loads(decoded)
-#         _debug_ok    = True
-#         _debug_error = None
-# except Exception as e:
-#     _debug_ok    = False
-#     _debug_error = str(e)
-#     _debug_data  = []
 
-# with st.expander("🔧 Debug Info (remove before going live)"):
-#     st.write(f"**GitHub API URL:** `{GITHUB_API_URL}`")
-#     st.write(f"**Token configured:** {'✅ Yes' if st.secrets.get('GIT_TOKEN', os.environ.get('GIT_TOKEN','')) else '❌ No token found'}")
-#     st.write(f"**Fetch success:** {'✅ Yes' if _debug_ok else f'❌ Failed — {_debug_error}'}")
-#     st.write(f"**Donations found:** {len(_debug_data)}")
-#     if _debug_data:
-#         st.json(_debug_data[-3:])  # show last 3 donations
 
-# donations   = load_donations()
-# raised      = total_raised(donations)
-# pct         = min(raised / GOAL * 100, 100)
-# remaining   = max(GOAL - raised, 0)
-# donor_count = len(donations)
+donations   = load_donations()
+raised      = total_raised(donations)
+pct         = min(raised / GOAL * 100, 100)
+remaining   = max(GOAL - raised, 0)
+donor_count = len(donations)
 
 # ── Hero ──────────────────────────────────────────────────────────────────────
 st.markdown('<div class="hero-title">✝ Conference Fund 2025</div>', unsafe_allow_html=True)
